@@ -1,0 +1,76 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: alex (generated)
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: login
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 2
+      author: your_name
+      changes:
+        - createTable:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: user_roles
+            baseColumnNames: user_id
+            constraintName: fk_user_roles_users
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: CASCADE
+  - changeSet:
+      id: 3
+      author: alex
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, value: "1" }
+              - column: { name: email, value: "admin@x.ru" }
+              - column: { name: login, value: "admin" }
+              - column: { name: password, value: "$2a$10$V47HhDIfi2mE7G6S5rZ0hu7XUwF/9bMv3aBdEB2R2I4D3NEB.YpG." } # bcrypt(admin)
+        - insert:
+            tableName: user_roles
+            columns:
+              - column: { name: user_id, value: "1" }
+              - column: { name: role, value: "ADMIN" }
+        - insert:
+            tableName: user_roles
+            columns:
+              - column: { name: user_id, value: "1" }
+              - column: { name: role, value: "USER" }
