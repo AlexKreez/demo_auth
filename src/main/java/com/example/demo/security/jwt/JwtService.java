@@ -1,9 +1,12 @@
 package com.example.demo.security.jwt;
 
+import com.example.demo.domain.entityUser.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +30,7 @@ public class JwtService {
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = Jwts.parser()  // Используем parser() вместо parserBuilder()
+        final Claims claims = Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
@@ -45,9 +48,29 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        try {
+            String username = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject();
+
+            return username.equals(userDetails.getUsername());
+        } catch (SignatureException e) {
+            System.out.println("❌ Ошибка подписи токена: " + e.getMessage());
+            return false;
+        } catch (JwtException e) {
+            System.out.println("❌ Ошибка валидации токена: " + e.getMessage());
+            return false;
+        }
     }
+
+    public String findExistingTokenForUser(User user) {
+        // Реализовать логику поиска токена (например, хранить токены в БД или кэше)
+        return null; // Пока заглушка, чтобы всегда выдавать новый токен
+    }
+
 
     private boolean isTokenExpired(String token) {
         return extractClaim(token, Claims::getExpiration).before(new Date());

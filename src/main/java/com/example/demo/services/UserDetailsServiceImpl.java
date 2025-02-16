@@ -24,16 +24,21 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        System.out.println("🔍 Загружаем пользователя: " + username);
+
         User user = userRepository.findByLogin(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("❌ Пользователь не найден: " + username));
+
+        System.out.println("✅ Найден пользователь: " + user.getLogin() + " (ID: " + user.getId() + ")");
 
         // ✅ Загружаем роли пользователя из БД
         List<UserRole> roles = userRoleRepository.findByUserId(user.getId());
         List<GrantedAuthority> authorities = roles.stream()
-                .map(role -> new SimpleGrantedAuthority("Роль: " + role.getRole()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRole()))
                 .collect(Collectors.toList());
 
-        System.out.println("В UserDetailsServiceImpl : ✅ User " + username + " roles: " + authorities);
+        System.out.println("✅ Роли пользователя " + username + ": " + authorities);
 
 
         return new org.springframework.security.core.userdetails.User(
