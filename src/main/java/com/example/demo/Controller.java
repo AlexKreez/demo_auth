@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -17,17 +19,16 @@ public class Controller {
      * 📌 Регистрация нового пользователя
      */
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody AuthRequest request) {
-        userService.registerUser(request.getLogin(), request.getPassword(), request.getEmail());
-        return ResponseEntity.ok("User registered successfully");
+    public ResponseEntity<Map<String, String>> register(@RequestBody AuthRequest request) {
+        userService.registerUser(request.getLogin(),  request.getEmail());
+        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
     }
-
     /**
      * 📌 Логин и генерация JWT токена
      */
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody AuthRequest request) {
         String token = userService.authenticateUser(request.getLogin(), request.getPassword());
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(Map.of("token: ", token));
     }
 }

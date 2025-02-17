@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.io.Serializable;
 
 @Entity
 @Getter
@@ -13,11 +12,11 @@ import java.io.Serializable;
 @Table(name = "user_roles")
 public class UserRole {
 
-    @EmbeddedId // ✅ Говорим Hibernate, что у таблицы нет id, а есть составной ключ
+    @EmbeddedId // Говорим что у таблицы нет id, а есть составной ключ
     private UserRoleId id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false) // ✅ Hibernate теперь понимает связь
+    @ManyToOne(fetch = FetchType.LAZY)//много ролей могут принадлежать одному пользователю
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
     public UserRole(User user, String role) {

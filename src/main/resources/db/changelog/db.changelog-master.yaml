@@ -53,3 +53,39 @@ databaseChangeLog:
             referencedTableName: users
             referencedColumnNames: id
             onDelete: CASCADE
+  - changeSet:
+      id: 3
+      author: migration
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: login
+                  value: "admin"
+              - column:
+                  name: email
+                  value: "admin@x.ru"
+              - column:
+                  name: password
+                  value: "$2a$10$HTBdNnYh/pPKgTLLptycqOXOM23vHtxq/RBLI/cDqvGTINQVDCEgG"
+
+        - insert:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: "(SELECT id FROM users WHERE login = 'admin')"
+              - column:
+                  name: role
+                  value: "ADMIN"
+
+        - insert:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: "(SELECT id FROM users WHERE login = 'admin')"
+              - column:
+                  name: role
+                  value: "USER"

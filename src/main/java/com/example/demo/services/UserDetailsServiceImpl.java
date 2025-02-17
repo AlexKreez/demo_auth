@@ -20,10 +20,11 @@ import java.util.stream.Collectors;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final UserRoleRepository userRoleRepository; // теперь роли загружаются тут
+    private final UserRoleRepository userRoleRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//  ищет пользователя по логину, получает его пароль и роли, а затем передает дальше
 
         System.out.println("🔍 Загружаем пользователя: " + username);
 
@@ -32,7 +33,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         System.out.println("✅ Найден пользователь: " + user.getLogin() + " (ID: " + user.getId() + ")");
 
-        // ✅ Загружаем роли пользователя из БД
+        // Загружаем роли пользователя из БД
         List<UserRole> roles = userRoleRepository.findByUserId(user.getId());
         List<GrantedAuthority> authorities = roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRole()))
@@ -48,3 +49,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         );
     }
 }
+//Добавить кеширование пользователей
+//Сейчас каждый раз при логине мы делаем SQL-запрос
+//Можно кешировать пользователей, чтобы не делать повторные запросы

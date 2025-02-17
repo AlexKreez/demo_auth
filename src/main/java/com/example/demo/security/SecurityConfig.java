@@ -21,7 +21,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-
+//      Настраивает JWT-аутентификацию
+//      Определяет, какие эндпоинты открыты, а какие требуют авторизации
+//      Добавляет фильтр для обработки JWT-токенов
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -39,15 +41,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/tools").hasAnyAuthority("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))//Не используем сессии, так как работаем с JWT
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);//Добавляем фильтр JWT перед фильтром логина-пароля
 
         return http.build();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider() {//Загружает пользователя через userDetailsService и проверяет пароль.
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());

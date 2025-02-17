@@ -15,8 +15,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
-public class JwtAuthFilter extends OncePerRequestFilter {
-
+public class JwtAuthFilter extends OncePerRequestFilter {//OncePerRequestFilter, чтобы обрабатывать каждый запрос только один раз
+//  Этот фильтр проверяет, есть ли JWT-токен в заголовке Authorization
+//  Извлекает логин пользователя из токена
+//  Проверяет, действителен ли токен
+//  Авторизует пользователя в системе, если токен корректен
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
@@ -38,12 +41,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String jwt = authHeader.substring(7);
+        final String jwt = authHeader.substring(7); //Удаляем Bearer (7 символов) и получаем чистый токен
         final String userLogin = jwtService.extractUsername(jwt);
 
         System.out.println("🔑 Extracted username from JWT: " + userLogin);
 
         if (userLogin != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+//              Если пользователь не аутентифицирован, загружаем его через UserDetailsService
+//              Проверяем, валиден ли токен (jwtService.isTokenValid())
+//              Если да, создаем объект авторизации UsernamePasswordAuthenticationToken и сохраняем в SecurityContext
             UserDetails userDetails = userDetailsService.loadUserByUsername(userLogin);
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 System.out.println("✅ Пользователь " + userDetails.getUsername() + " аутентифицирован с ролями: " + userDetails.getAuthorities());
@@ -54,7 +60,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 System.out.println("❌ Неправильный JWT");
             }
         } else {
-            System.out.println("❌ Пользователь не найден или уже существует");
+            System.out.println("❌ Пользователь не найден или уже аутентифицирован");
         }
 
         filterChain.doFilter(request, response);
