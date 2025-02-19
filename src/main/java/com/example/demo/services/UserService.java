@@ -24,14 +24,15 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final MailService mailService;
 
+
     public User registerUser(String login, String email) {
+
         if (userRepository.findByLogin(login).isPresent()) {
             throw new IllegalArgumentException("❌ Пользователь уже существует");
         }
         if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("❌ Email уже используется");
         }
-
         String generatedPassword = PasswordGenerator.generateRandomPassword(12);
         String hashedPassword = passwordEncoder.encode(generatedPassword);
 
@@ -39,31 +40,37 @@ public class UserService {
         user.setLogin(login);
         user.setPassword(hashedPassword);
         user.setEmail(email);
-
         User savedUser = userRepository.save(user);
-        userRoleRepository.save(new UserRole(savedUser, "USER"));
+
+        System.out.println("✅ Пользователь зарегистрирован с ID: " + savedUser.getId());
+        UserRole userRole = new UserRole(savedUser, "USER");
+
+        userRoleRepository.save(userRole);
+        System.out.println("✅ Роль USER выдана: " + savedUser.getLogin());
 
         mailService.sendEmail(email, generatedPassword);
-
         return savedUser;
     }
 
     public String authenticateUser(String login, String password) {
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new IllegalArgumentException("❌ Ошибка: Пользователь не найден"));
-
         if (!passwordEncoder.matches(password, user.getPassword())) {
+            System.out.println("❌ Ошибка: Неверный пароль для пользователя " + login);
             throw new BadCredentialsException("Неверный пароль");
         }
-
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(login, password)
         );
-
         return jwtService.generateToken(user);
     }
 
+
     public void changePassword(String login, String oldPassword, String newPassword) {
+        changePasswordInternal(login, oldPassword, newPassword);
+    }
+
+    private void changePasswordInternal(String login, String oldPassword, String newPassword) {
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new IllegalArgumentException("❌ Пользователь не найден"));
 
@@ -73,5 +80,6 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+        System.out.println("✅ Пароль успешно изменен для " + login);
     }
 }

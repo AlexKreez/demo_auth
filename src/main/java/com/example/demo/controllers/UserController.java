@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,14 +29,6 @@ public class UserController {
 
         String oldPassword = passwordData.get("oldPassword");
         String newPassword = passwordData.get("newPassword");
-        System.out.println("🔍 Полученные данные: " + passwordData);
-        System.out.println("🔍 oldPassword = " + passwordData.get("oldPassword"));
-        System.out.println("🔍 newPassword = " + passwordData.get("newPassword"));
-
-        System.out.println("🔍 UserService в UserController перед вызовом changePassword(): " + userService);
-        System.out.println("🔍 Контроллерный userService: " + userService);
-        System.out.println("🔍 Контекст Spring Security: " + SecurityContextHolder.getContext());
-
 
         userService.changePassword(authentication.getName(), oldPassword, newPassword);
         return ResponseEntity.ok("Пароль успешно изменен");

@@ -6,7 +6,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-//отправка почты. До сих пор в шоке от того что можно не прописывать @Value для каждого параметра
+//отправка почты
 @Service
 @RequiredArgsConstructor
 public class MailService {
