@@ -36,11 +36,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         // Загружаем роли пользователя из БД
         List<UserRole> roles = userRoleRepository.findByUserId(user.getId());
         List<GrantedAuthority> authorities = roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRole()))
+                .map(role -> new SimpleGrantedAuthority(role.getRole()))
                 .collect(Collectors.toList());
 
         System.out.println("✅ Роли пользователя " + username + ": " + authorities);
 
+        System.out.println("🔍 Итоговые роли для " + user.getLogin() + ": " + authorities);
 
         return new org.springframework.security.core.userdetails.User(
                 user.getLogin(),

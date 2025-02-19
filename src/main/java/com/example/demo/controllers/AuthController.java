@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.controllers;
 
 import com.example.demo.domain.dto.AuthRequest;
 import com.example.demo.services.UserService;
@@ -11,7 +11,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-public class Controller {
+public class AuthController {
 
     private final UserService userService;
 
