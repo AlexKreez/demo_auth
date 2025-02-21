@@ -43,11 +43,11 @@ public class UserService {
         user.setEmail(email);
         User savedUser = userRepository.save(user);
 
-        System.out.println("✅ Пользователь зарегистрирован с ID: " + savedUser.getId());
+        LOGGER.info("✅ Пользователь зарегистрирован с ID: {}", savedUser.getId());
         UserRole userRole = new UserRole(savedUser, "USER");
 
         userRoleRepository.save(userRole);
-        System.out.println("✅ Роль USER выдана: " + savedUser.getLogin());
+        LOGGER.info("✅ Роль USER выдана: {}", savedUser.getLogin());
 
         mailService.sendEmail(email, generatedPassword);
         return savedUser;
@@ -76,7 +76,6 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("❌ Пользователь не найден"));
 
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            LOGGER.warn("⚠️ Неверный текущий пароль для пользователя {}", login);
             throw new BadCredentialsException("❌ Неверный текущий пароль");
         }
 
