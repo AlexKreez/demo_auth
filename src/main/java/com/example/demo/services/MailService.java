@@ -1,6 +1,8 @@
 package com.example.demo.services;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -15,6 +17,7 @@ public class MailService {
 
     @Value("${spring.mail.username}")
     private String senderEmail;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailService.class);
 
     public void sendEmail(String mailTo, String password) {
         try {
@@ -29,7 +32,7 @@ public class MailService {
             message.setText("Здравствуйте!\n\nВаш сгенерированный пароль: " + password);
 
             mailSender.send(message);
-            System.out.println("📩 Email отправлен на " + mailTo);
+            LOGGER.info("📩 Email отправлен на {}", mailTo);
         } catch (MailException e) {
             throw new RuntimeException("Ошибка отправки почты: " + e.getMessage(), e);
         }

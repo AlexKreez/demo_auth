@@ -12,7 +12,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -23,7 +24,7 @@ public class UserService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final MailService mailService;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     public User registerUser(String login, String email) {
 
@@ -56,7 +57,7 @@ public class UserService {
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new IllegalArgumentException("❌ Ошибка: Пользователь не найден"));
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            System.out.println("❌ Ошибка: Неверный пароль для пользователя " + login);
+            LOGGER.error("❌ Ошибка: Неверный пароль для пользователя {}", login);
             throw new BadCredentialsException("Неверный пароль");
         }
         authenticationManager.authenticate(
@@ -75,11 +76,12 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("❌ Пользователь не найден"));
 
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            LOGGER.warn("⚠️ Неверный текущий пароль для пользователя {}", login);
             throw new BadCredentialsException("❌ Неверный текущий пароль");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-        System.out.println("✅ Пароль успешно изменен для " + login);
+        LOGGER.info("✅ Пароль успешно изменен для пользователя {}", login);
     }
 }

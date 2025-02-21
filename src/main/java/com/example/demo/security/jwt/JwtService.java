@@ -2,18 +2,18 @@ package com.example.demo.security.jwt;
 
 import com.example.demo.domain.entityUser.User;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.Optional;
 
 @Service
 public class JwtService {
@@ -23,6 +23,7 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long expirationMs;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtService.class);
 //Кодирует ключ
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -52,22 +53,16 @@ public class JwtService {
     }
 //Проверяет, валиден ли токен
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        try {
-            String username = Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getSubject();
-
-            return username.equals(userDetails.getUsername());
-        } catch (SignatureException e) {
-            System.out.println("❌ Ошибка подписи токена: " + e.getMessage());
-            return false;
-        } catch (JwtException e) {
-            System.out.println("❌ Ошибка валидации токена: " + e.getMessage());
-            return false;
-        }
+        return Optional.ofNullable(extractUsername(token))
+                .map(username -> {
+                    boolean isValid = username.equals(userDetails.getUsername());
+                    if (!isValid) LOGGER.warn("⚠️ Токен не соответствует пользователю {}", userDetails.getUsername());
+                    return isValid;
+                })
+                .orElseGet(() -> {
+                    LOGGER.error("❌ Ошибка валидации токена: токен недействителен");
+                    return false;
+                });
     }
 
     public String findExistingTokenForUser(User user) {

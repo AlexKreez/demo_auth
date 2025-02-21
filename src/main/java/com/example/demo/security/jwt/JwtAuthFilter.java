@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 @Component
@@ -22,6 +24,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {//OncePerRequestFilter,
 //  Авторизует пользователя в системе, если токен корректен
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthFilter.class);
 
     public JwtAuthFilter(JwtService jwtService, UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
@@ -32,11 +35,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {//OncePerRequestFilter,
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("🔍 Входящий запрос: " + request.getServletPath());
+        LOGGER.info("🔍 Входящий запрос: {}", request.getServletPath());
 
         final String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("❌ неправильный запрос (добавьте Bearer ) или запрос пустой");
+            LOGGER.warn("⚠️ Неправильный или пустой заголовок Authorization");
             filterChain.doFilter(request, response);
             return;
         }
@@ -44,7 +47,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {//OncePerRequestFilter,
         final String jwt = authHeader.substring(7); //Удаляем Bearer (7 символов) и получаем чистый токен
         final String userLogin = jwtService.extractUsername(jwt);
 
-        System.out.println("🔑 Extracted username from JWT: " + userLogin);
 
         if (userLogin != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 //              Если пользователь не аутентифицирован, загружаем его через UserDetailsService
@@ -52,15 +54,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {//OncePerRequestFilter,
 //              Если да, создаем объект авторизации UsernamePasswordAuthenticationToken и сохраняем в SecurityContext
             UserDetails userDetails = userDetailsService.loadUserByUsername(userLogin);
             if (jwtService.isTokenValid(jwt, userDetails)) {
-                System.out.println("✅ Пользователь " + userDetails.getUsername() + " аутентифицирован с ролями: " + userDetails.getAuthorities());
+                LOGGER.info("✅ Пользователь '{}' аутентифицирован с ролями: {}", userDetails.getUsername(), userDetails.getAuthorities());
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } else {
-                System.out.println("❌ Неправильный JWT");
+                LOGGER.error("❌ Неправильный JWT токен");
             }
         } else {
-            System.out.println("❌ Пользователь не найден или уже аутентифицирован");
+            LOGGER.warn("❌ Пользователь не найден или уже аутентифицирован");
         }
 
         filterChain.doFilter(request, response);
