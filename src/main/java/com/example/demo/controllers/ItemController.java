@@ -5,6 +5,7 @@ import com.example.demo.services.ItemService;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class ItemController {
 
     private final ItemService itemService;
 
+    @PreAuthorize("hasAnyAuthority('WAREHOUSE_MANAGER', 'INVENTORY_MANAGER')")
     @PostMapping("/create")
     public ResponseEntity<?> createItem(@RequestParam(required = false) Long templateId,
                                            @RequestParam(required = false) String templateName,
@@ -24,24 +26,28 @@ public class ItemController {
         return ResponseEntity.ok(result);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/get_all")
     public ResponseEntity<List<Item>> getAllItems() {
         List<Item> items = itemService.getAllItems();
         return ResponseEntity.ok(items);
     }
 
+    @PreAuthorize("hasAnyAuthority('WAREHOUSE_MANAGER', 'INVENTORY_MANAGER')")
     @GetMapping("/search/{id}")
     public ResponseEntity<Item> getItemById(@PathVariable Long id) {
         Item item = itemService.getItemById(id);
         return ResponseEntity.ok(item);
     }
 
+    @PreAuthorize("hasAnyAuthority('WAREHOUSE_MANAGER', 'INVENTORY_MANAGER')")
     @PutMapping("/update/{id}")
     public ResponseEntity<Item> updateItem(@PathVariable Long id, @RequestBody Item item) {
         Item updatedItem = itemService.updateItem(id, item);
         return ResponseEntity.ok(updatedItem);
     }
 
+    @PreAuthorize("hasAnyAuthority('WAREHOUSE_MANAGER', 'INVENTORY_MANAGER')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
         itemService.deleteItem(id);

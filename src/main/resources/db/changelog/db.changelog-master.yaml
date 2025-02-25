@@ -150,3 +150,47 @@ databaseChangeLog:
             referencedTableName: templates
             referencedColumnNames: id
             constraintName: fk_items_templates
+  - changeSet:
+      id: 5
+      author: alex
+      changes:
+        - createTable:
+            tableName: tool_transfer_requests
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: item_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: requested_by
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - addForeignKeyConstraint:
+            baseTableName: tool_transfer_requests
+            baseColumnNames: item_id
+            referencedTableName: items
+            referencedColumnNames: id
+            constraintName: fk_transfer_requests_items
+        - addForeignKeyConstraint:
+            baseTableName: tool_transfer_requests
+            baseColumnNames: requested_by
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_transfer_requests_users
