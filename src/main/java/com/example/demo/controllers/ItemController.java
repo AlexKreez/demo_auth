@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.domain.inventory.Item;
 import com.example.demo.services.ItemService;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,11 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping("/create")
-    public ResponseEntity<Item> createItem(@RequestBody Item item) {
-        Item createdItem = itemService.createItem(item);
-        return ResponseEntity.ok(createdItem);
+    public ResponseEntity<?> createItem(@RequestParam(required = false) Long templateId,
+                                           @RequestParam(required = false) String templateName,
+                                           @RequestBody(required = false) JsonNode itemData) {
+        Object result = itemService.createItem(templateId, templateName, itemData);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/get_all")
@@ -44,4 +47,9 @@ public class ItemController {
         itemService.deleteItem(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search_item_field")
+    public ResponseEntity<List<Item>> searchItems(@RequestParam String value) {
+        return ResponseEntity.ok(itemService.findItemsByValue(value));
+        }
 }

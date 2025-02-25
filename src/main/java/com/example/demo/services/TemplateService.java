@@ -36,4 +36,9 @@ public class TemplateService {
     public void deleteTemplate(Long id) {
         templateRepository.deleteById(id);
     }
+
+    public List<Template> findTemplatesByValue(String value) {
+        return templateRepository.findTemplateByJsonValue(value);
+    }
+
 }

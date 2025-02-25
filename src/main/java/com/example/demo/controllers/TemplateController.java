@@ -44,4 +44,10 @@ public class TemplateController {
         templateService.deleteTemplate(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search_template_field")
+    public ResponseEntity<List<Template>> searchTemplates(@RequestParam String value) {
+        return ResponseEntity.ok(templateService.findTemplatesByValue(value));
+    }
+
 }
