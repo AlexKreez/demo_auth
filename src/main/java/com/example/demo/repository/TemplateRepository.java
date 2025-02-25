@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TemplateRepository extends JpaRepository<Template, Long> {
-    // Дополнительные методы поиска по имени и т.п. можно добавить здесь.
 }
