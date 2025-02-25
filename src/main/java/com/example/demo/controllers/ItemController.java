@@ -48,8 +48,21 @@ public class ItemController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search_item_field")
+    @GetMapping("/search_item_value")
     public ResponseEntity<List<Item>> searchItems(@RequestParam String value) {
         return ResponseEntity.ok(itemService.findItemsByValue(value));
         }
+
+    @GetMapping("/search_by_field")
+    public ResponseEntity<List<Item>> searchItemsByField(@RequestParam String field, @RequestParam String value) {
+        return ResponseEntity.ok(itemService.findItemsByField(field, value));
+    }
+
+    @GetMapping("/search_by_number")
+    public ResponseEntity<List<Item>> searchItemsByNumber(@RequestParam String field,
+                                                          @RequestParam String operator,
+                                                          @RequestParam Double value) {
+        return ResponseEntity.ok(itemService.findItemsByNumber(field, operator, value));
+    }
+
 }

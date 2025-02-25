@@ -45,7 +45,7 @@ public class TemplateController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search_template_field")
+    @GetMapping("/search_template_value")
     public ResponseEntity<List<Template>> searchTemplates(@RequestParam String value) {
         return ResponseEntity.ok(templateService.findTemplatesByValue(value));
     }

@@ -85,4 +85,12 @@ public class ItemService {
     public List<Item> findItemsByValue(String value) {
         return itemRepository.findItemByJsonValue(value);
     }
+
+    public List<Item> findItemsByField(String field, String value) {
+        return itemRepository.findByJsonField(field, value);
+    }
+
+    public List<Item> findItemsByNumber(String field, String operator, Double value) {
+        return itemRepository.findByJsonNumber(field, operator, value);
+    }
 }
