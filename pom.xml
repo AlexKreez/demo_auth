@@ -167,7 +167,15 @@
                 <artifactId>janino</artifactId>
                 <version>3.1.11</version>
             </dependency>
-        </dependencies>
+
+        <dependency>
+            <groupId>com.vladmihalcea</groupId>
+            <artifactId>hibernate-types-60</artifactId>
+            <version>2.20.0</version>
+        </dependency>
+
+
+    </dependencies>
 
 
     <build>

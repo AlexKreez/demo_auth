@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 1
-      author: alex (generated)
+      author: alex
       changes:
         - createTable:
             tableName: users
@@ -31,7 +31,7 @@ databaseChangeLog:
                     nullable: false
   - changeSet:
       id: 2
-      author: your_name
+      author: alex
       changes:
         - createTable:
             tableName: user_roles
@@ -55,7 +55,7 @@ databaseChangeLog:
             onDelete: CASCADE
   - changeSet:
       id: 3
-      author: migration
+      author: alex
       changes:
         - insert:
             tableName: users
@@ -89,3 +89,64 @@ databaseChangeLog:
               - column:
                   name: role
                   value: "USER"
+  - changeSet:
+      id: 4
+      author: alex
+      changes:
+        - createTable:
+            tableName: templates
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: template
+                  type: JSONB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - createTable:
+            tableName: items
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: template_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: data
+                  type: JSONB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - addForeignKeyConstraint:
+            baseTableName: items
+            baseColumnNames: template_id
+            referencedTableName: templates
+            referencedColumnNames: id
+            constraintName: fk_items_templates
